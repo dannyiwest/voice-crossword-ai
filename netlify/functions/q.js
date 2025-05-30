@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+const { Configuration, OpenAIApi } = require("openai");
 
 exports.handler = async (event) => {
   const { genre } = event.queryStringParameters || {};
@@ -6,54 +6,39 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: "Unsupported genre" };
   }
 
-  const owner  = process.env.GITHUB_OWNER;
-  const repo   = process.env.GITHUB_REPO;
-  const branch = process.env.GITHUB_BRANCH || 'main';
-  const path   = "food-questions.json";
-  const url    = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`;
+  const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY
+  });
+  const openai = new OpenAIApi(configuration);
 
-  let allQs;
+  // Prompt to generate 25 tiered food questions with hints and difficulty
+  const prompt = `
+Generate a JSON array of 25 unique trivia questions about food. Each item should have:
+- "question": the question text
+- "hint": a helpful hint for the question
+- "difficulty": one of "easy", "medium", "hard", or "very hard"
+Ensure the array is ordered from easiest to hardest.
+Return only the JSON array.
+`;
+
   try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`GitHub returned ${res.status}`);
-    allQs = await res.json();
+    const completion = await openai.createChatCompletion({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7
+    });
+    const jsonText = completion.data.choices[0].message.content;
+    const questions = JSON.parse(jsonText);
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(questions)
+    };
   } catch (err) {
+    console.error(err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: err.message })
     };
   }
-
-  // Group by difficulty
-  const groups = { easy: [], medium: [], hard: [], "very hard": [] };
-  allQs.forEach(q => {
-    const diff = q.difficulty.toLowerCase();
-    if (groups[diff]) groups[diff].push(q);
-  });
-
-  // Shuffle helper
-  const shuffle = (arr) => {
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-  };
-  Object.values(groups).forEach(shuffle);
-
-  // Concatenate in difficulty order
-  const ordered = [
-    ...groups.easy,
-    ...groups.medium,
-    ...groups.hard,
-    ...groups["very hard"]
-  ];
-
-  // Take first 25
-  const questions = ordered.slice(0, 25);
-
-  return {
-    statusCode: 200,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(questions)
-  };
 };
