@@ -1,3 +1,5 @@
+import fetch from "node-fetch";
+
 // Fetch questions from public GitHub raw URL (no auth needed)
 export const handler = async (event) => {
   const { genre } = event.queryStringParameters || {};
