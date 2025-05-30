@@ -142,7 +142,7 @@ async function fetchQuestions(genre) {
 function listenForGenre() {
   const rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
   rec.lang = 'en-US';
-  rec.start();
+  setTimeout(() => { rec.start(); }, 800);
   rec.onresult = e => {
     const g = e.results[0][0].transcript.trim().toLowerCase();
     document.getElementById('transcript').textContent = g;
