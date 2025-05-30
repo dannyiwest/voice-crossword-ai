@@ -1,7 +1,7 @@
-import fetch from "node-fetch";
+const fetch = require('node-fetch');
 
 // Fetch questions from public GitHub raw URL (no auth needed)
-export const handler = async (event) => {
+exports.handler = async (event) => {
   const { genre } = event.queryStringParameters || {};
   if (genre === "food") {
     const owner = process.env.GITHUB_OWNER;
