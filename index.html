@@ -11,7 +11,6 @@
   #btn-container button { width:80%; height:160px; font-size:3.2rem; margin: 0; }
   #genre-btn { background: blue; }
   #hint-btn { background: green; }
-      #start-btn { background: orange; }
   #start-btn { background: orange; }
   #mic-meter { width:80%; height:32px; background:#eee; margin-top:1rem; }
   #mic-fill { height:100%; background:#4caf50; width:0%; }
@@ -31,7 +30,6 @@
   #btn-container button { width:80%; height:160px; font-size:3.2rem; margin: 0; }
   #genre-btn { background: blue; }
   #hint-btn { background: green; }
-      #start-btn { background: orange; }
   #start-btn { background: orange; }
   #mic-meter { width:80%; height:32px; background:#eee; margin-top:1rem; }
   #mic-fill { height:100%; background:#4caf50; width:0%; }
@@ -62,6 +60,12 @@
   <div id="debug-log"></div>
 
 <script>
+let isSpeaking = false;
+function gatedStart(rec) {
+  if (!isSpeaking) gatedStart(rec);
+  else { speechSynthesis.onend = () => gatedStart(rec); }
+}
+
 let debugMode = true;
 function debug(msg) {
   if (!debugMode) return;
@@ -96,10 +100,13 @@ let currentGenre = "", questions = [], idx = 0, expectedAnswer = "";
 const genres = ["food"];
 
 function speak(text, cb) {
-  const msg = new SpeechSynthesisUtterance(text);
-  msg.lang = 'en-US';
-  msg.rate = 0.9;
-  msg.onend = cb || function(){};
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  isSpeaking = true;
+  u.onend = () => { isSpeaking = false; if (cb) cb(); };
+  speechSynthesis.speak(u);
+  document.getElementById('status').textContent = text;
+};
   speechSynthesis.speak(msg);
   document.getElementById('status').textContent = text;
 }
@@ -142,7 +149,7 @@ async function fetchQuestions(genre) {
 function listenForGenre() {
   const rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
   rec.lang = 'en-US';
-  setTimeout(() => { rec.start(); }, 800);
+  gatedStart(rec);
   rec.onresult = e => {
     const g = e.results[0][0].transcript.trim().toLowerCase();
     document.getElementById('transcript').textContent = g;
@@ -174,7 +181,7 @@ function listenForAnswer() {
   debug("listenForAnswer");
   const rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
   rec.lang = 'en-US';
-  rec.start();
+  gatedStart(rec);
   rec.onresult = e => {
     const ans = e.results[0][0].transcript.trim().toLowerCase();
     document.getElementById('transcript').textContent = ans;
@@ -203,21 +210,6 @@ document.getElementById('genre-btn').onclick = () => {
   listGenres();
   listenForGenre();
 };
-
-document.getElementById('start-btn').onclick = async () => {
-  debug("start-btn clicked");
-  // Ask for microphone permission immediately
-  try {
-    await navigator.mediaDevices.getUserMedia({ audio: true });
-    startMicMeter();
-    speak("Available genres: food. Please say your chosen genre after the beep.", () => {
-      listenForGenre();
-    });
-  } catch (err) {
-    speak("Microphone access is required. Please allow microphone permission.");
-  }
-};
-
 document.getElementById('hint-btn').onclick = () => speak("Hint: " + (questions[idx]?.hint || ""), () => {});
 
 </script>

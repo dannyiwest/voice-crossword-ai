@@ -1,62 +1,44 @@
-const fetch = require('node-fetch');
+const OpenAI = require("openai");
 
 exports.handler = async (event) => {
   const genre = event.queryStringParameters && event.queryStringParameters.genre;
-  if (genre !== 'food') {
-    return { statusCode: 400, body: 'Unsupported genre' };
+  console.log("Handler invoked, genre:", genre);
+  if (genre !== "food") {
+    return { statusCode: 400, body: "Unsupported genre" };
   }
-
-  const owner  = process.env.GITHUB_OWNER;
-  const repo   = process.env.GITHUB_REPO;
-  const branch = process.env.GITHUB_BRANCH || 'main';
-  const path   = 'food-questions.json';
-  const url    = 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/' + path;
-
+  if (!process.env.OPENAI_API_KEY) {
+    console.error("Missing OPENAI_API_KEY");
+    return { statusCode: 500, body: "Server misconfiguration" };
+  }
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const prompt = `
+Generate a JSON array of 25 unique trivia questions about ${genre}. 
+Each item should have:
+- "question": the question
+- "hint": a helpful hint
+- "difficulty": one of "easy", "medium", "hard", or "very hard"
+Order the array from easiest to hardest. Return only the JSON array.
+`;
   try {
-    const res = await fetch(url);
-    if (res.status !== 200) {
-      return {
-        statusCode: res.status,
-        body: 'Error fetching questions: ' + res.status
-      };
-    }
-    const allQs = await res.json();
-
-    // Group by difficulty
-    const groups = { easy: [], medium: [], hard: [], 'very hard': [] };
-    allQs.forEach(q => {
-      const d = q.difficulty.toLowerCase();
-      if (groups[d]) groups[d].push(q);
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+      max_tokens: 800
     });
-
-    // Shuffle each group
-    function shuffle(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-    }
-    shuffle(groups.easy);
-    shuffle(groups.medium);
-    shuffle(groups.hard);
-    shuffle(groups['very hard']);
-
-    // Concatenate in difficulty order
-    const ordered = groups.easy.concat(groups.medium, groups.hard, groups['very hard']);
-
-    // Take first 25
-    const questions = ordered.slice(0, 25);
-
+    const jsonText = completion.choices[0].message.content.trim();
+    console.log("OpenAI response:", jsonText.substring(0,100));
+    const questions = JSON.parse(jsonText);
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(questions)
     };
-
-  } catch (error) {
+  } catch (err) {
+    console.error("OpenAI error:", err);
     return {
       statusCode: 500,
-      body: 'Function error: ' + error.message
+      body: JSON.stringify({ error: err.message })
     };
   }
 };
