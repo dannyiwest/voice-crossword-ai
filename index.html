@@ -10,7 +10,7 @@
     body { margin:0; font-family: sans-serif; display:flex; flex-direction:column; height:100vh; }
     #status { padding:1rem; text-align:center; font-size:1.5rem; flex:0 0 auto; }
     #btn-container { flex:1; display:flex; }
-    button { flex:1; border:none; color:white; font-size:2rem; }
+    button { flex:1; border:none; color:white; font-size:1.8rem; }
     #genre-btn { background:green; }
     #hint-btn { background:blue; }
     #mic-meter { width:100%; height:20px; background:#eee; margin-top:1rem; }
@@ -19,6 +19,7 @@
 </head>
 <body>
   <div id="status">Tap a button to begin</div>
+  <div id="recognized-text" style="padding:1rem; font-size:1.5rem; color:#000; text-align:center;"></div>
   <div id="btn-container">
     <button id="genre-btn">Genres</button>
     <button id="hint-btn">Hint</button>
@@ -27,6 +28,7 @@
 
   <script>
     let currentGenre="", expectedAnswer="", step=1;
+    let recentWords=[];
     const genres = ["science", "mystery", "history", "literature", "geography", "art", "math", "technology", "sports", "food"];
     function speak(text, cb) {
       const msg = new SpeechSynthesisUtterance(text);
@@ -50,14 +52,39 @@
       rec.lang="en-US"; rec.start();
       rec.onresult = e => {
         const g = e.results[0][0].transcript.trim().toLowerCase();
+        document.getElementById('recognized-text').textContent = 'You said: '+g;
+        
+        const g = e.results[0][0].transcript.trim().toLowerCase();
         if (genres.includes(g)) {
           currentGenre = g; showClue();
-        } else {
+        
+      } else {
           speak("Genre not recognized. Say genres.", listGenres);
         }
       }
     }
     async function showClue() {
+      startMicMeter();
+      // Prevent duplicates within last 50
+      const attemptFetch = async () => {
+        const url = `/.netlify/functions/q?genre=${currentGenre}&step=${step}`;
+        try {
+          const res = await fetch(url);
+          const {word, clue} = await res.json();
+          const w = word.toLowerCase();
+          if (recentWords.includes(w)) {
+            // duplicate, try again
+            return await attemptFetch();
+          }
+          recentWords.push(w);
+          if (recentWords.length > 50) recentWords.shift();
+          expectedAnswer = w;
+          speak(clue, listenForAnswer);
+          document.getElementById("status").textContent = clue;
+        } catch { speak("Error generating clue."); }
+      };
+      await attemptFetch();
+    }
       const url = `/.netlify/functions/q?genre=${currentGenre}&step=${step}`;
       try {
         const res = await fetch(url);
@@ -73,10 +100,14 @@
       const rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
       rec.lang="en-US"; rec.start();
       rec.onresult = e => {
+        const g = e.results[0][0].transcript.trim().toLowerCase();
+        document.getElementById('recognized-text').textContent = 'You said: '+g;
+        
         const ans = e.results[0][0].transcript.trim().toLowerCase();
         if (ans==="hint") {
           speak("First letter is "+expectedAnswer.charAt(0), listenForAnswer);
-        } else if (ans===expectedAnswer) {
+        
+      } else if (ans===expectedAnswer) {
           speak("Correct.", ()=>{ step++; showClue(); });
         } else {
           speak("Incorrect. The answer was "+expectedAnswer, ()=>{ step++; showClue(); });
