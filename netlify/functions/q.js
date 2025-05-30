@@ -1,59 +1,62 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-  const { genre } = event.queryStringParameters || {};
-  if (genre !== "food") {
-    return { statusCode: 400, body: "Unsupported genre" };
+  const genre = event.queryStringParameters && event.queryStringParameters.genre;
+  if (genre !== 'food') {
+    return { statusCode: 400, body: 'Unsupported genre' };
   }
 
   const owner  = process.env.GITHUB_OWNER;
   const repo   = process.env.GITHUB_REPO;
   const branch = process.env.GITHUB_BRANCH || 'main';
-  const path   = "food-questions.json";
-  const url = "https://raw.githubusercontent.com/" + owner + "/" + repo + "/" + branch + "/" + path;
+  const path   = 'food-questions.json';
+  const url    = 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/' + path;
 
-  let allQs;
   try {
     const res = await fetch(url);
-    if (!res.ok) throw new Error(\`GitHub returned \${res.status}\`);
-    allQs = await res.json();
-  } catch (err) {
+    if (res.status !== 200) {
+      return {
+        statusCode: res.status,
+        body: 'Error fetching questions: ' + res.status
+      };
+    }
+    const allQs = await res.json();
+
+    // Group by difficulty
+    const groups = { easy: [], medium: [], hard: [], 'very hard': [] };
+    allQs.forEach(q => {
+      const d = q.difficulty.toLowerCase();
+      if (groups[d]) groups[d].push(q);
+    });
+
+    // Shuffle each group
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+    shuffle(groups.easy);
+    shuffle(groups.medium);
+    shuffle(groups.hard);
+    shuffle(groups['very hard']);
+
+    // Concatenate in difficulty order
+    const ordered = groups.easy.concat(groups.medium, groups.hard, groups['very hard']);
+
+    // Take first 25
+    const questions = ordered.slice(0, 25);
+
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(questions)
+    };
+
+  } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message })
+      body: 'Function error: ' + error.message
     };
   }
-
-  // Group by difficulty
-  const groups = { easy: [], medium: [], hard: [], "very hard": [] };
-  allQs.forEach(q => {
-    const diff = q.difficulty.toLowerCase();
-    if (groups[diff]) groups[diff].push(q);
-  });
-
-  // Shuffle each group
-  const shuffle = arr => {
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-  };
-  Object.values(groups).forEach(shuffle);
-
-  // Concatenate in difficulty order
-  const ordered = [
-    ...groups.easy,
-    ...groups.medium,
-    ...groups.hard,
-    ...groups["very hard"]
-  ];
-
-  // Take first 25
-  const questions = ordered.slice(0, 25);
-
-  return {
-    statusCode: 200,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(questions)
-  };
 };
