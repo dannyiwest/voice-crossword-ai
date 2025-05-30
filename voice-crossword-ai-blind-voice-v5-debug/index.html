@@ -3,28 +3,42 @@
 <head>
 
   
-    <style>
-      body { margin:0; font-family: sans-serif; display:flex; flex-direction:column; height:100vh; }
-      #status { padding:1rem; text-align:center; font-size:1.5rem; flex:0 0 auto; }
-      #btn-container { flex:1; display:flex; flex-direction: column; justify-content: center; }
-      #btn-container button { flex: none; width:100%; height:200px; font-size:4rem; margin: 5px 0; border:none; color:white; border-radius: 8px; }
-      #genre-btn { background: blue; }
-      #hint-btn { background: green; }
-      #start-btn { background: orange; }
-      #mic-meter { width:100%; height:40px; background:#eee; margin-top:1rem; }
-      #mic-fill { height:100%; background:#4caf50; width:0%; }
-      #transcript { padding:1rem; font-size:2rem; text-align:center; }
-    </style>
+    
+<style>
+  body { margin:0; font-family: sans-serif; display:flex; flex-direction:column; justify-content: space-evenly; align-items: center; height:100vh; }
+  #status { padding:1rem; text-align:center; font-size:1rem; flex:0 0 auto; }
+  #btn-container { flex:1; display:flex; flex-direction: column; justify-content: space-evenly; align-items: center; width:100%; }
+  #btn-container button { width:80%; height:160px; font-size:3.2rem; margin: 0; }
+  #genre-btn { background: blue; }
+  #hint-btn { background: green; }
+  #start-btn { background: orange; }
+  #mic-meter { width:80%; height:32px; background:#eee; margin-top:1rem; }
+  #mic-fill { height:100%; background:#4caf50; width:0%; }
+  #progress-bar { width:80%; height:16px; background:#eee; margin:10px 0; }
+  #progress-fill { width:0%; height:100%; background:#2196f3; }
+  #transcript { padding:1rem; font-size:1.6rem; text-align:center; width:80%; }
+  #debug-log { width:80%; height:150px; background:#333; color:#0f0; font-size:1rem; overflow:auto; margin-top:10px; padding:5px; }
+</style>
 
 
-  <style>
-    .big-button {
-      width: 100%;
-      height: 100px;
-      font-size: 2rem;
-      margin: 10px 0;
-    }
-  </style>
+
+  
+<style>
+  body { margin:0; font-family: sans-serif; display:flex; flex-direction:column; justify-content: space-evenly; align-items: center; height:100vh; }
+  #status { padding:1rem; text-align:center; font-size:1rem; flex:0 0 auto; }
+  #btn-container { flex:1; display:flex; flex-direction: column; justify-content: space-evenly; align-items: center; width:100%; }
+  #btn-container button { width:80%; height:160px; font-size:3.2rem; margin: 0; }
+  #genre-btn { background: blue; }
+  #hint-btn { background: green; }
+  #start-btn { background: orange; }
+  #mic-meter { width:80%; height:32px; background:#eee; margin-top:1rem; }
+  #mic-fill { height:100%; background:#4caf50; width:0%; }
+  #progress-bar { width:80%; height:16px; background:#eee; margin:10px 0; }
+  #progress-fill { width:0%; height:100%; background:#2196f3; }
+  #transcript { padding:1rem; font-size:1.6rem; text-align:center; width:80%; }
+  #debug-log { width:80%; height:150px; background:#333; color:#0f0; font-size:1rem; overflow:auto; margin-top:10px; padding:5px; }
+</style>
+
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Voice Crossword PWA</title>
@@ -43,9 +57,20 @@
     <div id="progress-fill" style="width:0%; height:100%; background:#2196f3;"></div>
   </div>
   <div id="transcript">Waiting...</div>
+  <div id="debug-log"></div>
 
 <script>
+let debugMode = true;
+function debug(msg) {
+  if (!debugMode) return;
+  const log = document.getElementById("debug-log");
+  const entry = document.createElement("div");
+  entry.textContent = msg;
+  log.appendChild(entry);
+}
+
 function showProgressBar() {
+  debug("showProgressBar");
   const bar = document.getElementById('progress-bar');
   const fill = document.getElementById('progress-fill');
   bar.style.display = 'block';
@@ -56,6 +81,7 @@ function showProgressBar() {
   }, 200);
 }
 function hideProgressBar() {
+  debug("hideProgressBar");
   clearInterval(window.progressInterval);
   const bar = document.getElementById('progress-bar');
   const fill = document.getElementById('progress-fill');
@@ -100,11 +126,14 @@ function listGenres() {
 
 
 async function fetchQuestions(genre) {
+  debug("fetchQuestions called for " + genre);
   showProgressBar();
   const res = await fetch('/.netlify/functions/q?genre=' + genre);
+  debug("fetch response status: " + res.status);
   const qs = await res.json();
   hideProgressBar();
   questions = qs;
+  debug("questions loaded: " + questions.length);
 }
 
 
@@ -131,6 +160,7 @@ function listenForGenre() {
 }
 
 function askQuestion() {
+  debug("askQuestion idx=" + idx);
   const q = questions[idx];
   expectedAnswer = q.answer.toLowerCase();
   speak("Question " + (idx+1), () => {
@@ -139,6 +169,7 @@ function askQuestion() {
 }
 
 function listenForAnswer() {
+  debug("listenForAnswer");
   const rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
   rec.lang = 'en-US';
   rec.start();
