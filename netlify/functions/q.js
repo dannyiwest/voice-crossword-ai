@@ -15,7 +15,7 @@ exports.handler = async (event) => {
   let allQs;
   try {
     const res = await fetch(url);
-    if (!res.ok) throw new Error(`GitHub returned ${res.status}`);
+    if (!res.ok) throw new Error(\`GitHub returned \${res.status}\`);
     allQs = await res.json();
   } catch (err) {
     return {
