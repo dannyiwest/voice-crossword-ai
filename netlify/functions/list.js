@@ -3,20 +3,27 @@ import OpenAI from "openai";
 export const handler = async (event) => {
   const { genre } = event.queryStringParameters || {};
   const prompt = `
-Generate 50 unique crossword clues and their answers for the genre "${genre}", with increasing difficulty. 
-Return a JSON array of objects: { "word": "<answer>", "clue": "<clue>" } only.
+provide 50 unique questions with increasing difficulty and be sure not to include any question that leads to the same answer for any of the 50 questions.
+Genre: ${genre}.
+Return strictly a JSON array of objects: { "word": "<answer>", "clue": "<clue>" }.
 `;
   try {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const resp = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini-high",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.7
     });
-    const arr = JSON.parse(resp.choices[0].message.content);
-    return { statusCode: 200, body: JSON.stringify(arr) };
+    const arr = JSON.parse(response.choices[0].message.content);
+    return {
+      statusCode: 200,
+      body: JSON.stringify(arr)
+    };
   } catch (err) {
-    console.error(err);
-    return { statusCode: 500, body: JSON.stringify({ error: "List generation failed" }) };
+    console.error("OpenAI error:", err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "List generation failed" })
+    };
   }
 };
