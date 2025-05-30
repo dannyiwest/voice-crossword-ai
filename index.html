@@ -205,16 +205,16 @@ function listenForAnswer() {
 
 // Button handlers
 
+
 document.getElementById('genre-btn').onclick = async () => {
   debug("genre-btn clicked");
   startMicMeter();
-  speak("Loading quiz for food");
-  showProgressBar();
-  await fetchQuestions("food");
-  hideProgressBar();
-  idx = 0;
-  speak("Starting quiz", () => askQuestion());
+  listGenres();
+  speak("Please say your chosen genre after the beep", () => {
+    listenForGenre();
+  });
 };
+
 
 document.getElementById('hint-btn').onclick = () => speak("Hint: " + (questions[idx]?.hint || ""), () => {});
 
