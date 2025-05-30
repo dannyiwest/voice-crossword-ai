@@ -3,32 +3,32 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Voice Crossword AI V9</title>
+<title>Voice Crossword AI V10</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a202c">
 <style>
   body { margin:0; font-family: sans-serif; display:flex; flex-direction:column; height:100vh; }
-  #status { padding:1rem; text-align:center; font-size:1.5rem; flex:0 0 auto; }
+  #status { padding:1rem; text-align:center; font-size:1.5rem; }
   #recognized-text { text-align:center; font-size:1.2rem; color:#000; min-height:1.5rem; }
   #btn-container { flex:1; display:flex; }
   button { flex:1; border:none; color:white; font-size:1.8rem; margin:0; }
-  #genre-btn { background:green; }
+  #start-btn { background:green; }
   #hint-btn { background:blue; }
-  #mic-meter { width:100%; height:20px; background:#eee; margin-top:1rem; flex:0 0 auto; }
+  #mic-meter { width:100%; height:20px; background:#eee; }
   #mic-fill { height:100%; background:#4caf50; width:0%; }
 </style>
 </head>
 <body>
-<div id="status">Tap “Genres” to begin.</div>
+<div id="status">Tap “Start” to begin food questions.</div>
 <div id="recognized-text"></div>
 <div id="btn-container">
-  <button id="genre-btn">Genres</button>
+  <button id="start-btn">Start</button>
   <button id="hint-btn">Hint</button>
 </div>
 <div id="mic-meter"><div id="mic-fill"></div></div>
 <script>
-let currentGenre="", expectedAnswer="";
-let questionList=[], currentIndex=0;
+let expectedAnswer = "";
+let questionList = [], currentIndex = 0;
 
 function speak(text, cb) {
   const msg = new SpeechSynthesisUtterance(text);
@@ -38,10 +38,9 @@ function speak(text, cb) {
 }
 
 async function fetchQuestions() {
-  document.getElementById("status").textContent = "Loading questions…";
-  questionList = [];
+  document.getElementById("status").textContent = "Loading food questions…";
   try {
-    const res = await fetch(`/.netlify/functions/list?genre=${currentGenre}`);
+    const res = await fetch(`/.netlify/functions/list?genre=food`);
     questionList = await res.json();
   } catch (e) {
     console.error(e);
@@ -61,18 +60,6 @@ async function showClue() {
   speak(clue, listenForAnswer);
   document.getElementById("status").textContent = clue;
   if (currentIndex >= questionList.length) currentIndex = 0;
-}
-
-function listenForGenre() {
-  const rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
-  rec.lang = "en-US"; rec.start();
-  rec.onresult = async e => {
-    const g = e.results[0][0].transcript.trim().toLowerCase();
-    document.getElementById("recognized-text").textContent = "You said: " + g;
-    currentGenre = g;
-    await fetchQuestions();
-    showClue();
-  };
 }
 
 function listenForAnswer() {
@@ -101,7 +88,7 @@ function startMicMeter() {
     const data = new Uint8Array(analyser.frequencyBinCount);
     function update() {
       analyser.getByteTimeDomainData(data);
-      let sum = 0; data.forEach(v=>sum += ((v - 128)/128)**2);
+      let sum = 0; data.forEach(v=>sum += ((v-128)/128)**2);
       document.getElementById("mic-fill").style.width = Math.min(100, Math.sqrt(sum/data.length)*300) + "%";
       requestAnimationFrame(update);
     }
@@ -110,12 +97,10 @@ function startMicMeter() {
 }
 
 window.addEventListener('load', startMicMeter);
-
-document.getElementById("genre-btn").onclick = listenForGenre;
-document.getElementById("hint-btn").onclick = () => { if (expectedAnswer) speak("First letter is "+expectedAnswer.charAt(0)); };
-
-if('serviceWorker' in navigator) {
-  window.addEventListener('load', ()=>navigator.serviceWorker.register('service-worker.js'));
+document.getElementById("start-btn").onclick = async () => { await fetchQuestions(); showClue(); };
+document.getElementById("hint-btn").onclick = () => { if (expectedAnswer) speak("First letter is " + expectedAnswer.charAt(0)); };
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('service-worker.js'));
 }
 </script>
 </body>
