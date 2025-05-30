@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Voice Crossword AI V6</title>
+<title>Voice Crossword AI V8</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a202c">
 <style>
@@ -19,7 +19,7 @@
 </style>
 </head>
 <body>
-<div id="status">Tap a button to begin</div>
+<div id="status">Tap “Genres” to begin.</div>
 <div id="recognized-text"></div>
 <div id="btn-container">
   <button id="genre-btn">Genres</button>
@@ -31,30 +31,31 @@ let currentGenre="", expectedAnswer="";
 let questionList=[], currentIndex=0;
 
 function speak(text, cb) {
-  const msg=new SpeechSynthesisUtterance(text);
-  msg.rate=0.75;
-  msg.onend=cb||(()=>{});
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.rate = 0.75;
+  msg.onend = cb || (()=>{});
   speechSynthesis.speak(msg);
 }
 
 async function fetchQuestions() {
-  document.getElementById("status").textContent="Loading questions…";
+  document.getElementById("status").textContent = "Loading questions…";
+  questionList = [];
   try {
     const res = await fetch(`/.netlify/functions/list?genre=${currentGenre}`);
     questionList = await res.json();
-    currentIndex=0;
-  } catch(e) {
+  } catch (e) {
     console.error(e);
     speak("Failed to load questions.", null);
   }
+  currentIndex = 0;
 }
 
 async function showClue() {
-  startMicMeter();
-  if (!questionList.length) {
+  if (questionList.length === 0) {
     speak("No questions available.", null);
     return;
   }
+  startMicMeter();
   const { word, clue } = questionList[currentIndex++];
   expectedAnswer = word.toLowerCase();
   speak(clue, listenForAnswer);
@@ -63,56 +64,59 @@ async function showClue() {
 }
 
 function listenForGenre() {
-  const rec=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
-  rec.lang="en-US"; rec.start();
-  rec.onresult=async e=>{
-    const g=e.results[0][0].transcript.trim().toLowerCase();
-    document.getElementById("recognized-text").textContent="You said: "+g;
-    currentGenre=g;
+  const rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+  rec.lang = "en-US"; rec.start();
+  rec.onresult = async e => {
+    const g = e.results[0][0].transcript.trim().toLowerCase();
+    document.getElementById("recognized-text").textContent = "You said: " + g;
+    currentGenre = g;
     await fetchQuestions();
     showClue();
   };
 }
 
 function listenForAnswer() {
-  const rec=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
-  rec.lang="en-US"; rec.start();
-  rec.onresult=e=>{
-    const a=e.results[0][0].transcript.trim().toLowerCase();
-    document.getElementById("recognized-text").textContent="You said: "+a;
-    if (a==="hint") {
-      speak("First letter is "+expectedAnswer.charAt(0), listenForAnswer);
+  const rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+  rec.lang = "en-US"; rec.start();
+  rec.onresult = e => {
+    const a = e.results[0][0].transcript.trim().toLowerCase();
+    document.getElementById("recognized-text").textContent = "You said: " + a;
+    if (a === "hint") {
+      speak("First letter is " + expectedAnswer.charAt(0), listenForAnswer);
     } else {
-      if (a===expectedAnswer) {
-        speak("Correct.", () => { showClue(); });
+      if (a === expectedAnswer) {
+        speak("Correct.", showClue);
       } else {
-        speak("Incorrect. The answer was "+expectedAnswer, () => { showClue(); });
+        speak("Incorrect. The answer was " + expectedAnswer, showClue);
       }
     }
   };
 }
 
 function startMicMeter() {
-  navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
-    const ctx=new (window.AudioContext||window.webkitAudioContext)();
-    const analyser=ctx.createAnalyser();
+  navigator.mediaDevices.getUserMedia({audio:true}).then(stream => {
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const analyser = ctx.createAnalyser();
     ctx.createMediaStreamSource(stream).connect(analyser);
-    const data=new Uint8Array(analyser.frequencyBinCount);
+    const data = new Uint8Array(analyser.frequencyBinCount);
     function update() {
       analyser.getByteTimeDomainData(data);
-      let sum=0; data.forEach(v=>sum+=((v-128)/128)**2);
-      document.getElementById("mic-fill").style.width=Math.min(100,Math.sqrt(sum/data.length)*300)+"%";
+      let sum = 0; data.forEach(v=>sum += ((v - 128)/128)**2);
+      document.getElementById("mic-fill").style.width = Math.min(100, Math.sqrt(sum/data.length)*300) + "%";
       requestAnimationFrame(update);
     }
     update();
   });
 }
 
-document.getElementById("genre-btn").onclick=listenForGenre;
-document.getElementById("hint-btn").onclick=()=>{ if(expectedAnswer) speak("First letter is "+expectedAnswer.charAt(0)); };
+// Start mic meter on load to show input level
+window.addEventListener('load', startMicMeter);
 
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js'));
+document.getElementById("genre-btn").onclick = listenForGenre;
+document.getElementById("hint-btn").onclick = ()=>{ if (expectedAnswer) speak("First letter is "+expectedAnswer.charAt(0)); };
+
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', ()=>navigator.serviceWorker.register('service-worker.js'));
 }
 </script>
 </body>
