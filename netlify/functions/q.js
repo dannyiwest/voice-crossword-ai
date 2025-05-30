@@ -10,7 +10,7 @@ exports.handler = async (event) => {
   const repo   = process.env.GITHUB_REPO;
   const branch = process.env.GITHUB_BRANCH || 'main';
   const path   = "food-questions.json";
-  const url    = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`;
+  const url = "https://raw.githubusercontent.com/" + owner + "/" + repo + "/" + branch + "/" + path;
 
   let allQs;
   try {
