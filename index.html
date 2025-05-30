@@ -11,7 +11,7 @@
   #btn-container button { width:80%; height:160px; font-size:3.2rem; margin: 0; }
   #genre-btn { background: blue; }
   #hint-btn { background: green; }
-  #start-btn { background: orange; }
+  
   #mic-meter { width:80%; height:32px; background:#eee; margin-top:1rem; }
   #mic-fill { height:100%; background:#4caf50; width:0%; }
   #progress-bar { width:80%; height:16px; background:#eee; margin:10px 0; }
@@ -30,7 +30,7 @@
   #btn-container button { width:80%; height:160px; font-size:3.2rem; margin: 0; }
   #genre-btn { background: blue; }
   #hint-btn { background: green; }
-  #start-btn { background: orange; }
+  
   #mic-meter { width:80%; height:32px; background:#eee; margin-top:1rem; }
   #mic-fill { height:100%; background:#4caf50; width:0%; }
   #progress-bar { width:80%; height:16px; background:#eee; margin:10px 0; }
@@ -47,7 +47,6 @@
 <body>
   <div id="status">Tap "Start Quiz" to begin</div>
   <div id="btn-container">
-    <button id="start-btn" class="big-button" aria-label="Start Quiz">Start Quiz</button>
     <button id="genre-btn" aria-label="Genres">Genres</button>
     <button id="hint-btn" aria-label="Hint">Hint</button>
   </div>
@@ -205,11 +204,18 @@ function listenForAnswer() {
 }
 
 // Button handlers
-document.getElementById('genre-btn').onclick = () => {
+
+document.getElementById('genre-btn').onclick = async () => {
+  debug("genre-btn clicked");
   startMicMeter();
-  listGenres();
-  listenForGenre();
+  speak("Loading quiz for food");
+  showProgressBar();
+  await fetchQuestions("food");
+  hideProgressBar();
+  idx = 0;
+  speak("Starting quiz", () => askQuestion());
 };
+
 document.getElementById('hint-btn').onclick = () => speak("Hint: " + (questions[idx]?.hint || ""), () => {});
 
 </script>
