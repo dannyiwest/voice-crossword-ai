@@ -2,6 +2,7 @@
   "name": "voice-crossword-ai",
   "version": "2.0.0",
   "dependencies": {
+    "node-fetch": "^2.7.0",
     "openai": "^4.7.0"
   }
 }

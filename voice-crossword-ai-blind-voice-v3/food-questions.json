@@ -1,0 +1,152 @@
+[
+  {
+    "question": "Which fruit is botanically a berry and shares its name with a popular red breakfast spread?",
+    "answer": "Strawberry",
+    "difficulty": "easy",
+    "hint": "It\u2019s red and seeds are on the outside."
+  },
+  {
+    "question": "What grain\u2014staple in sushi\u2014is also the botanical seed of a grass species?",
+    "answer": "Rice",
+    "difficulty": "easy",
+    "hint": "Think of a tiny white seed you rinse before cooking."
+  },
+  {
+    "question": "Which dairy product is cultured with Lactobacillus bulgaricus and Streptococcus thermophilus?",
+    "answer": "Yogurt",
+    "difficulty": "easy",
+    "hint": "Often eaten with granola or fruit."
+  },
+  {
+    "question": "What legume is the main ingredient in hummus?",
+    "answer": "Chickpea",
+    "difficulty": "easy",
+    "hint": "Also called garbanzo bean."
+  },
+  {
+    "question": "Which nut is actually a legume, often used to make a dairy-free \u201cmilk\u201d?",
+    "answer": "Peanut",
+    "difficulty": "easy",
+    "hint": "Goes well with jelly in a sandwich."
+  },
+  {
+    "question": "What Italian cured meat comes from pork belly and is often thinly sliced on antipasto platters?",
+    "answer": "Pancetta",
+    "difficulty": "medium",
+    "hint": "Similar to bacon but unsmoked."
+  },
+  {
+    "question": "Which spice, derived from Crocus sativus stigmas, is prized as the world\u2019s most expensive by weight?",
+    "answer": "Saffron",
+    "difficulty": "medium",
+    "hint": "Gives dishes a golden-yellow color."
+  },
+  {
+    "question": "What fungus is used to ferment soybeans, giving miso its distinctive flavor?",
+    "answer": "Aspergillus oryzae",
+    "difficulty": "medium",
+    "hint": "Also called koji mold."
+  },
+  {
+    "question": "Which cut of beef from the diaphragm is known for its tenderness and flavor (also called skirt steak)?",
+    "answer": "Hanger steak",
+    "difficulty": "medium",
+    "hint": "Sometimes called the butcher\u2019s steak."
+  },
+  {
+    "question": "In baking, what type of sugar has crystals so fine they dissolve instantly, often used in icings?",
+    "answer": "Powdered sugar",
+    "difficulty": "medium",
+    "hint": "Also called confectioners\u2019 sugar."
+  },
+  {
+    "question": "Which green oilseed\u2019s paste is a staple in Middle Eastern cooking, made by grinding with olive oil?",
+    "answer": "Tahini (sesame seed)",
+    "difficulty": "medium",
+    "hint": "Key ingredient in hummus."
+  },
+  {
+    "question": "What Japanese rice wine uses the koji mold Aspergillus oryzae in its fermentation?",
+    "answer": "Sake",
+    "difficulty": "medium",
+    "hint": "Often served warm or chilled in small cups."
+  },
+  {
+    "question": "Which citrus fruit is a hybrid of a pomelo and an orange?",
+    "answer": "Grapefruit",
+    "difficulty": "medium",
+    "hint": "Often eaten at breakfast, half-cut."
+  },
+  {
+    "question": "What heat-activated protein in egg whites causes them to solidify when cooked?",
+    "answer": "Ovalbumin",
+    "difficulty": "hard",
+    "hint": "Makes meringues stiff."
+  },
+  {
+    "question": "Which sugar alcohol, derived from birch bark or corn, is used as a low-calorie sweetener?",
+    "answer": "Xylitol",
+    "difficulty": "hard",
+    "hint": "Common in sugar-free gum."
+  },
+  {
+    "question": "What Maillard reaction intermediate gives browned crusts their characteristic aroma?",
+    "answer": "Furanones",
+    "difficulty": "hard",
+    "hint": "Contributes to cooked flavors."
+  },
+  {
+    "question": "Which enzyme in pineapple can break down proteins and is used as a meat tenderizer?",
+    "answer": "Bromelain",
+    "difficulty": "hard",
+    "hint": "Too much can prevent gelatin from setting."
+  },
+  {
+    "question": "What emulsifier\u2014lecithin\u2014is often extracted from sunflower or soybeans to stabilize chocolate?",
+    "answer": "Phosphatidylcholine",
+    "difficulty": "hard",
+    "hint": "Also found in egg yolks."
+  },
+  {
+    "question": "Which pea relative is the main ingredient in the Scandinavian dish \u00e4rtsoppa?",
+    "answer": "Yellow split peas",
+    "difficulty": "hard",
+    "hint": "Used in split-pea soup."
+  },
+  {
+    "question": "What rare fungus, also called \u201cwhite truffle,\u201d grows underground near oak trees in Italy?",
+    "answer": "Tuber magnatum",
+    "difficulty": "hard",
+    "hint": "Highly prized in gourmet cooking."
+  },
+  {
+    "question": "Which volatile compound gives cilantro its soapy flavor to some people?",
+    "answer": "E-2-decenal",
+    "difficulty": "very hard",
+    "hint": "An aldehyde causing the soapy taste."
+  },
+  {
+    "question": "What calcium-oxalate crystal causes the burning sensation when eating rhubarb leaves?",
+    "answer": "Oxalic acid",
+    "difficulty": "very hard",
+    "hint": "Also contributes to kidney stones."
+  },
+  {
+    "question": "Which sugar isomer, found in honey and fruits, is twice as sweet as sucrose?",
+    "answer": "Fructose",
+    "difficulty": "very hard",
+    "hint": "A monosaccharide in table sugar."
+  },
+  {
+    "question": "What acid in unripe tomatoes gives them astringency and tangy mouthfeel?",
+    "answer": "Citric acid",
+    "difficulty": "very hard",
+    "hint": "Common in citrus fruits."
+  },
+  {
+    "question": "Which polyphenol, abundant in red wine and berries, has been studied for cardiovascular benefits?",
+    "answer": "Resveratrol",
+    "difficulty": "very hard",
+    "hint": "Found in grape skins."
+  }
+]

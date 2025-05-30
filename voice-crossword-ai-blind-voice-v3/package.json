@@ -1,0 +1,7 @@
+{
+  "name": "voice-crossword-ai",
+  "version": "2.0.0",
+  "dependencies": {
+    "openai": "^4.7.0"
+  }
+}
