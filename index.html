@@ -11,6 +11,7 @@
   #btn-container button { width:80%; height:160px; font-size:3.2rem; margin: 0; }
   #genre-btn { background: blue; }
   #hint-btn { background: green; }
+      #start-btn { background: orange; }
   #start-btn { background: orange; }
   #mic-meter { width:80%; height:32px; background:#eee; margin-top:1rem; }
   #mic-fill { height:100%; background:#4caf50; width:0%; }
@@ -30,6 +31,7 @@
   #btn-container button { width:80%; height:160px; font-size:3.2rem; margin: 0; }
   #genre-btn { background: blue; }
   #hint-btn { background: green; }
+      #start-btn { background: orange; }
   #start-btn { background: orange; }
   #mic-meter { width:80%; height:32px; background:#eee; margin-top:1rem; }
   #mic-fill { height:100%; background:#4caf50; width:0%; }
@@ -201,6 +203,21 @@ document.getElementById('genre-btn').onclick = () => {
   listGenres();
   listenForGenre();
 };
+
+document.getElementById('start-btn').onclick = async () => {
+  debug("start-btn clicked");
+  // Ask for microphone permission immediately
+  try {
+    await navigator.mediaDevices.getUserMedia({ audio: true });
+    startMicMeter();
+    speak("Available genres: food. Please say your chosen genre after the beep.", () => {
+      listenForGenre();
+    });
+  } catch (err) {
+    speak("Microphone access is required. Please allow microphone permission.");
+  }
+};
+
 document.getElementById('hint-btn').onclick = () => speak("Hint: " + (questions[idx]?.hint || ""), () => {});
 
 </script>
