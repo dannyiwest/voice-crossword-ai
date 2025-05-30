@@ -3,10 +3,7 @@ import OpenAI from "openai";
 export const handler = async (event) => {
   const { genre } = event.queryStringParameters || {};
   const prompt = `
-provide 25 unique questions with increasing difficulty and be sure not to include any question that leads to the same answer for any of the 25 questions.
-Genre: ${genre}.
-Return strictly a JSON array of objects: { "word": "<answer>", "clue": "<clue>" }.
-`;
+They were classified as easy, medium, difficult, hard: I am making a game, list 25 unique questions that increase with difficulty in the genre of ${genre}.`;
   try {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const response = await openai.chat.completions.create({

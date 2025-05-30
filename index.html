@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Voice Crossword AI V8</title>
+<title>Voice Crossword AI V9</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a202c">
 <style>
@@ -51,7 +51,7 @@ async function fetchQuestions() {
 }
 
 async function showClue() {
-  if (questionList.length === 0) {
+  if (!questionList.length) {
     speak("No questions available.", null);
     return;
   }
@@ -109,11 +109,10 @@ function startMicMeter() {
   });
 }
 
-// Start mic meter on load to show input level
 window.addEventListener('load', startMicMeter);
 
 document.getElementById("genre-btn").onclick = listenForGenre;
-document.getElementById("hint-btn").onclick = ()=>{ if (expectedAnswer) speak("First letter is "+expectedAnswer.charAt(0)); };
+document.getElementById("hint-btn").onclick = () => { if (expectedAnswer) speak("First letter is "+expectedAnswer.charAt(0)); };
 
 if('serviceWorker' in navigator) {
   window.addEventListener('load', ()=>navigator.serviceWorker.register('service-worker.js'));
