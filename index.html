@@ -63,26 +63,35 @@
         }
       }
     }
-    async function showClue() {
+    
+async function showClue() {
       startMicMeter();
-      // Prevent duplicates within last 50
-      const attemptFetch = async () => {
-        const url = `/.netlify/functions/q?genre=${currentGenre}&step=${step}`;
+      let word, clue;
+      // Try up to 10 times to avoid repeating the same answer
+      for (let attempt = 0; attempt < 10; attempt++) {
         try {
-          const res = await fetch(url);
-          const {word, clue} = await res.json();
-          const w = word.toLowerCase();
-          if (recentWords.includes(w)) {
-            // duplicate, try again
-            return await attemptFetch();
-          }
-          recentWords.push(w);
+          const res = await fetch(`/.netlify/functions/q?genre=${currentGenre}&step=${step}`);
+          const data = await res.json();
+          word = data.word.toLowerCase();
+          clue = data.clue;
+        } catch {
+          continue;
+        }
+        if (!recentWords.includes(word)) {
+          recentWords.push(word);
           if (recentWords.length > 50) recentWords.shift();
-          expectedAnswer = w;
-          speak(clue, listenForAnswer);
-          document.getElementById("status").textContent = clue;
-        } catch { speak("Error generating clue."); }
-      };
+          expectedAnswer = word;
+          break;
+        }
+      }
+      if (!word) {
+        speak("Unable to find a new clue.", function(){});
+        return;
+      }
+      speak(clue, listenForAnswer);
+      document.getElementById("status").textContent = clue;
+    }
+;
       await attemptFetch();
     }
       const url = `/.netlify/functions/q?genre=${currentGenre}&step=${step}`;
