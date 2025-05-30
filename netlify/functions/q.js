@@ -1,6 +1,8 @@
 const { Configuration, OpenAIApi } = require("openai");
 
 exports.handler = async (event) => {
+  console.log("Handler invoked, genre:", event.queryStringParameters.genre);
+  console.log("OpenAI API key present:", !!process.env.OPENAI_API_KEY);
   const { genre } = event.queryStringParameters || {};
   if (genre !== "food") {
     return { statusCode: 400, body: "Unsupported genre" };
@@ -35,6 +37,8 @@ Return only the JSON array.
       body: JSON.stringify(questions)
     };
   } catch (err) {
+    console.error("OpenAI error:", err);
+
     console.error(err);
     return {
       statusCode: 500,
