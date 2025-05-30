@@ -1,13 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <style>
+    .big-button {
+      width: 100%;
+      height: 100px;
+      font-size: 2rem;
+      margin: 10px 0;
+    }
+  </style>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Voice Crossword PWA</title>
 </head>
 <body>
   <div id="quiz">
-    <div id="question"></div>
+    <button id="hint" class="big-button" aria-label="Hint">Hint</button>
+    <button id="genre" class="big-button" aria-label="Genre">Genre</button>
+  </div>
     <input id="answer" type="text" placeholder="Your answer…"/>
     <button id="submit">Submit</button>
     <button id="hint">Hint</button>
@@ -70,6 +80,13 @@
           ctx.clearRect(0,0,canvas.width,canvas.height);
           ctx.fillRect(0, canvas.height - h, canvas.width, h);
         })();
+
+    document.getElementById('genre').addEventListener('click', () => {
+      idx = 0;
+      loadQuestions();
+    });
+    // Remove submit and hint logic remains only for hint button
+
       })
       .catch(err => console.error("Mic init error:", err));
     }
