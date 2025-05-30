@@ -62,8 +62,8 @@
 <script>
 let isSpeaking = false;
 function gatedStart(rec) {
-  if (!isSpeaking) gatedStart(rec);
-  else { speechSynthesis.onend = () => gatedStart(rec); }
+  if (!isSpeaking) rec.start();
+  else { speechSynthesis.onend = () => rec.start(); }
 }
 
 let debugMode = true;
