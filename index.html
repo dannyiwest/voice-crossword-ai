@@ -60,18 +60,6 @@
   <div id="debug-log"></div>
 
 <script>
-debug("Script loaded");
-debug("start-btn present: " + !!document.getElementById('start-btn'));
-debug("genre-btn present: " + !!document.getElementById('genre-btn'));
-debug("hint-btn present: " + !!document.getElementById('hint-btn'));
-
-
-let isSpeaking = false;
-function gatedStart(rec) {
-  if (!isSpeaking) rec.start();
-  else { speechSynthesis.onend = () => rec.start(); }
-}
-
 let debugMode = true;
 function debug(msg) {
   if (!debugMode) return;
@@ -106,13 +94,10 @@ let currentGenre = "", questions = [], idx = 0, expectedAnswer = "";
 const genres = ["food"];
 
 function speak(text, cb) {
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US';
-  isSpeaking = true;
-  u.onend = () => { isSpeaking = false; if (cb) cb(); };
-  speechSynthesis.speak(u);
-  document.getElementById('status').textContent = text;
-};
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.lang = 'en-US';
+  msg.rate = 0.9;
+  msg.onend = cb || function(){};
   speechSynthesis.speak(msg);
   document.getElementById('status').textContent = text;
 }
@@ -155,7 +140,7 @@ async function fetchQuestions(genre) {
 function listenForGenre() {
   const rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
   rec.lang = 'en-US';
-  gatedStart(rec);
+  rec.start();
   rec.onresult = e => {
     const g = e.results[0][0].transcript.trim().toLowerCase();
     document.getElementById('transcript').textContent = g;
@@ -187,7 +172,7 @@ function listenForAnswer() {
   debug("listenForAnswer");
   const rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
   rec.lang = 'en-US';
-  gatedStart(rec);
+  rec.start();
   rec.onresult = e => {
     const ans = e.results[0][0].transcript.trim().toLowerCase();
     document.getElementById('transcript').textContent = ans;
@@ -216,8 +201,6 @@ document.getElementById('genre-btn').onclick = () => {
   listGenres();
   listenForGenre();
 };
-
-debug('genre-btn handler attached');
 document.getElementById('hint-btn').onclick = () => speak("Hint: " + (questions[idx]?.hint || ""), () => {});
 
 </script>
