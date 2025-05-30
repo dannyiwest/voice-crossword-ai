@@ -128,7 +128,7 @@ function listGenres() {
 async function fetchQuestions(genre) {
   debug("fetchQuestions called for " + genre);
   showProgressBar();
-  const res = await fetch(`${location.origin}/.netlify/functions/q?genre=${genre}`);
+  const res = await fetch('/.netlify/functions/q?genre=' + genre);
   debug("fetch response status: " + res.status);
   const qs = await res.json();
   hideProgressBar();
