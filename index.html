@@ -11,7 +11,7 @@
   #btn-container button { width:80%; height:160px; font-size:3.2rem; margin: 0; }
   #genre-btn { background: blue; }
   #hint-btn { background: green; }
-  
+  #start-btn { background: orange; }
   #mic-meter { width:80%; height:32px; background:#eee; margin-top:1rem; }
   #mic-fill { height:100%; background:#4caf50; width:0%; }
   #progress-bar { width:80%; height:16px; background:#eee; margin:10px 0; }
@@ -30,7 +30,7 @@
   #btn-container button { width:80%; height:160px; font-size:3.2rem; margin: 0; }
   #genre-btn { background: blue; }
   #hint-btn { background: green; }
-  
+  #start-btn { background: orange; }
   #mic-meter { width:80%; height:32px; background:#eee; margin-top:1rem; }
   #mic-fill { height:100%; background:#4caf50; width:0%; }
   #progress-bar { width:80%; height:16px; background:#eee; margin:10px 0; }
@@ -47,6 +47,7 @@
 <body>
   <div id="status">Tap "Start Quiz" to begin</div>
   <div id="btn-container">
+    <button id="start-btn" class="big-button" aria-label="Start Quiz">Start Quiz</button>
     <button id="genre-btn" aria-label="Genres">Genres</button>
     <button id="hint-btn" aria-label="Hint">Hint</button>
   </div>
@@ -137,32 +138,23 @@ async function fetchQuestions(genre) {
 
 
 function listenForGenre() {
-  debug("listenForGenre");
   const rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
   rec.lang = 'en-US';
   rec.start();
-  rec.onresult = async e => {
+  rec.onresult = e => {
     const g = e.results[0][0].transcript.trim().toLowerCase();
     document.getElementById('transcript').textContent = g;
     if (genres.includes(g)) {
       currentGenre = g;
-      debug("Genre recognized: " + g);
       speak("Loading quiz for " + currentGenre, async () => {
-        showProgressBar();
         await fetchQuestions(currentGenre);
-        hideProgressBar();
         idx = 0;
+        expectedAnswer = questions[idx].answer.toLowerCase();
         speak("Starting quiz", () => askQuestion());
       });
     } else {
-      speak("Genre not recognized. Please say a genre from the list.", () => listenForGenre());
+      speak("Genre not recognized. Please say food", () => listenForGenre());
     }
-  };
-  rec.onerror = () => {
-    speak("Error listening. Please try again.", () => listenForGenre());
-  };
-}
-
   };
   rec.onerror = () => speak("Error listening for genre. Try again.", () => listenForGenre());
 }
@@ -204,18 +196,11 @@ function listenForAnswer() {
 }
 
 // Button handlers
-
-
-document.getElementById('genre-btn').onclick = async () => {
-  debug("genre-btn clicked");
+document.getElementById('genre-btn').onclick = () => {
   startMicMeter();
   listGenres();
-  speak("Please say your chosen genre after the beep", () => {
-    listenForGenre();
-  });
+  listenForGenre();
 };
-
-
 document.getElementById('hint-btn').onclick = () => speak("Hint: " + (questions[idx]?.hint || ""), () => {});
 
 </script>
