@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+console.log("OPENAI_API_KEY is", process.env.OPENAI_API_KEY ? "loaded" : "MISSING");
 
 export const handler = async (event) => {
   const { genre, step } = event.queryStringParameters || {};
