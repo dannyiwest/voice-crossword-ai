@@ -60,6 +60,12 @@
   <div id="debug-log"></div>
 
 <script>
+debug("Script loaded");
+debug("start-btn present: " + !!document.getElementById('start-btn'));
+debug("genre-btn present: " + !!document.getElementById('genre-btn'));
+debug("hint-btn present: " + !!document.getElementById('hint-btn'));
+
+
 let isSpeaking = false;
 function gatedStart(rec) {
   if (!isSpeaking) rec.start();
@@ -210,6 +216,8 @@ document.getElementById('genre-btn').onclick = () => {
   listGenres();
   listenForGenre();
 };
+
+debug('genre-btn handler attached');
 document.getElementById('hint-btn').onclick = () => speak("Hint: " + (questions[idx]?.hint || ""), () => {});
 
 </script>
