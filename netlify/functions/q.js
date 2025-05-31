@@ -1,4 +1,4 @@
-const { Configuration, OpenAIApi } = require("openai");
+const OpenAI = require("openai");
 
 exports.handler = async (event) => {
   const genre = event.queryStringParameters && event.queryStringParameters.genre;
@@ -12,8 +12,9 @@ exports.handler = async (event) => {
     return { statusCode: 500, body: "Server misconfiguration" };
   }
 
-  const configuration = new Configuration({ apiKey: process.env.OPENAI_API_KEY });
-  const openai = new OpenAIApi(configuration);
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+  });
 
   // PROMPT: ask for exactly 20 items, compact JSON, no extra text
   const userPrompt = `
@@ -27,14 +28,14 @@ Return only the JSON array of exactly 20 objects, in ascending order of difficul
 
   try {
     console.log("Sending OpenAI request");
-    const completion = await openai.createChatCompletion({
+    const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: userPrompt }],
       temperature: 0.7,
       max_tokens: 1500
     });
 
-    const jsonText = completion.data.choices[0].message.content.trim();
+    const jsonText = completion.choices[0].message.content.trim();
     console.log("Raw OpenAI response (first 200 chars):", jsonText.substring(0, 200));
 
     let questions;
