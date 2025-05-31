@@ -9,23 +9,24 @@
   <style>
     /* === Consolidated & Adjusted CSS === */
 
-    /* Buttons: reduced 30% (70% of previous width/height) */
+    /* Buttons: reduced 30% (70% of previous width/height & font-size) */
     #btn-container button {
-      width: 39.2%;          
-      height: 78px;          
-      font-size: 4.16rem;    
-      margin: 0;
+      width: 27.44%;         /* 39.2% × 0.7 */
+      height: 55px;          /* 78px × 0.7 ≈ 55px */
+      font-size: 2.912rem;   /* 4.16rem × 0.7 ≈ 2.912rem */
+      margin: 0 auto;        /* center each button horizontally */
+      display: block;        /* ensure margin:auto works */
     }
 
-    /* Status (top text): was 1rem → now 1.5rem (50% increase) */
+    /* Status (top “question” text): was 1.5rem → now 3rem (100% increase) */
     #status {
       padding: 1rem;
       text-align: center;
-      font-size: 1.5rem;
+      font-size: 3rem;
       flex: 0 0 auto;
     }
 
-    /* Transcript (bottom text): was 1.6rem → now 2.4rem (50% increase) */
+    /* Transcript (bottom text) remains at 2.4rem unless you want to change it separately */
     #transcript {
       padding: 1rem;
       font-size: 2.4rem;
@@ -38,13 +39,57 @@
     #genre-btn { background: blue; color: orange; }
     #hint-btn  { background: green; color: orange; }
     #stop-btn  { background: red; color: white; }
-    body       { margin: 0; font-family: sans-serif; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; height: 100vh; }
-    #btn-container { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; width: 100%; }
-    #mic-meter   { width: 80%; height: 32px; background: #eee; margin-top: 1rem; }
-    #mic-fill    { height: 100%; background: #4caf50; width: 0%; }
-    #progress-bar  { width: 80%; height: 16px; background: #eee; margin: 10px 0; display: none; }
-    #progress-fill { width: 0%; height: 100%; background: #2196f3; }
-    #debug-log   { width: 80%; height: 150px; background: #333; color: #fff; font-size: 1rem; overflow: auto; margin-top: 10px; padding: 5px; }
+
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+      height: 100vh;
+    }
+    #btn-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+      width: 100%;
+    }
+    #mic-meter {
+      width: 80%;
+      height: 32px;
+      background: #eee;
+      margin-top: 1rem;
+    }
+    #mic-fill {
+      height: 100%;
+      background: #4caf50;
+      width: 0%;
+    }
+    #progress-bar {
+      width: 80%;
+      height: 16px;
+      background: #eee;
+      margin: 10px 0;
+      display: none;
+    }
+    #progress-fill {
+      width: 0%;
+      height: 100%;
+      background: #2196f3;
+    }
+    #debug-log {
+      width: 80%;
+      height: 150px;
+      background: #333;
+      color: #fff;
+      font-size: 1rem;
+      overflow: auto;
+      margin-top: 10px;
+      padding: 5px;
+    }
   </style>
 </head>
 <body>
@@ -207,7 +252,7 @@
     }
 
     function normalizeText(s) {
-      return s.replace(/[^\w\s]|_/g, "").replace(/\s+/g, " ").trim().toLowerCase();
+      return s.replace(/[^\\w\\s]|_/g, "").replace(/\\s+/g, " ").trim().toLowerCase();
     }
 
     function askQuestion() {
