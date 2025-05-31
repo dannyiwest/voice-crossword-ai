@@ -7,6 +7,7 @@
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#1a202c">
   <style>
+    /* Buttons auto-size with nowrap and padding */
     #btn-container button {
       width: auto;
       white-space: nowrap;
@@ -15,19 +16,27 @@
       margin: 0.5rem auto;
       display: block;
     }
-    #status { padding: 1rem; text-align: center; font-size: 12rem;
+    /* Corrected button colors */
+    #start-btn { background: green; color: white; }
+    #genre-btn { background: blue; color: orange; }
+    #hint-btn  { background: orange; color: blue; }
+    #stop-btn  { background: red; color: white; }
+
+    /* Status text doubled to 12rem */
+    #status {
+      padding: 1rem;
+      text-align: center;
+      font-size: 12rem;
       flex: 0 0 auto;
+      word-wrap: break-word;
     }
+    /* Transcript text */
     #transcript {
       padding: 1rem;
       font-size: 2.4rem;
       text-align: center;
       width: 80%;
     }
-    #start-btn { background: orange; color: blue; }
-    #genre-btn { background: blue; color: orange; }
-    #hint-btn  { background: green; color: orange; }
-    #stop-btn  { background: red; color: white; }
     body {
       margin: 0;
       font-family: sans-serif;
@@ -54,14 +63,12 @@
 </head>
 <body>
   <div id="status">Tap "Start Quiz" to begin</div>
-
   <div id="btn-container">
     <button id="start-btn">Start Quiz</button>
     <button id="genre-btn">Choose Genre</button>
     <button id="hint-btn">Hint</button>
     <button id="stop-btn">Stop Quiz</button>
   </div>
-
   <div id="mic-meter"><div id="mic-fill"></div></div>
   <div id="progress-bar"><div id="progress-fill"></div></div>
   <div id="transcript">Waiting...</div>
@@ -144,6 +151,7 @@
       document.getElementById('mic-fill').style.width = '0%';
     }
     let currentGenre = "", questions = [], idx = 0, expectedAnswer = "";
+    // Corrected genres array without leading spaces
     const genres = [
       "food",
       "entertainment",
