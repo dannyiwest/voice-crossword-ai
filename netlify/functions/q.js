@@ -27,8 +27,15 @@ Order the array from easiest to hardest. Return only the JSON array.
       max_tokens: 800
     });
     const jsonText = completion.choices[0].message.content.trim();
+    let questions;
+    try {
+      questions = JSON.parse(jsonText);
+    } catch (e) {
+      console.error('JSON parse error:', e, 'Content:', jsonText);
+      return { statusCode: 500, body: jsonText };
+    }
     console.log("OpenAI response:", jsonText.substring(0,100));
-    const questions = JSON.parse(jsonText);
+    
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
