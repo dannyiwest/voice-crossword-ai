@@ -15,13 +15,13 @@ exports.handler = async (event) => {
   }
 
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const systemPrompt = \`
-    You are a quiz-master. Provide a JSON array of 20 quiz questions about \${genre}.
+  const systemPrompt = `
+    You are a quiz-master. Provide a JSON array of 20 quiz questions about ${genre}.
     Each element must be an object with exactly these keys: "question", "answer", "difficulty", "hint".
     "difficulty" should be one of ["easy", "medium", "hard", "very hard"].
     The "hint" field should be a single-sentence hint. Output ONLY valid JSON.
-  \`;
-  const userPrompt = \`Generate 20 \${genre} trivia questions, ordered from easiest to hardest.\`;
+  `;
+  const userPrompt = `Generate 20 ${genre} trivia questions, ordered from easiest to hardest.`;
 
   try {
     const response = await openai.chat.completions.create({
@@ -58,7 +58,7 @@ exports.handler = async (event) => {
   } catch (openaiError) {
     console.error("OpenAI error:", openaiError);
     try {
-      const filePath = path.join(__dirname, "..", \`\${genre}-questions.json\`);
+      const filePath = path.join(__dirname, "..", `${genre}-questions.json`);
       const raw = fs.readFileSync(filePath, "utf-8");
       const fallbackQuestions = JSON.parse(raw);
       return {

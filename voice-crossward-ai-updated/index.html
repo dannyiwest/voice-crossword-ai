@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Voice Crossword PWA</title>
+  <title>Voice Crossword PWA v1.0.2</title>
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#1a202c">
   <style>
@@ -22,11 +22,11 @@
     #hint-btn  { background: orange; color: blue; }
     #stop-btn  { background: red; color: white; }
 
-    /* Status text doubled to 12rem */
+    /* Status text doubled from 12rem to 24rem */
     #status {
       padding: 1rem;
       text-align: center;
-      font-size: 12rem;
+      font-size: 24rem;
       flex: 0 0 auto;
       word-wrap: break-word;
     }
@@ -117,6 +117,8 @@
         const msg = new SpeechSynthesisUtterance(text);
         msg.lang = 'en-US';
         msg.rate = 0.9;
+        msg.volume = 1;  // ensure consistent volume
+        msg.pitch = 1;   // consistent pitch
         msg.onend = resolve;
         speechSynthesis.speak(msg);
         document.getElementById('status').textContent = text;
@@ -158,7 +160,7 @@
     }
 
     let currentGenre = "", questions = [], idx = 0, expectedAnswer = "";
-    const genres = ["food", "entertainment", "science", "investing", "mystery", "sports"];
+    const genres = ["food","entertainment","science","investing","mystery","sports"];
 
     async function fetchQuestions(genre) {
       debug("fetchQuestions called for " + genre);
