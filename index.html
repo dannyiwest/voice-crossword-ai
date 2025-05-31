@@ -9,24 +9,25 @@
   <style>
     /* === Consolidated & Adjusted CSS === */
 
-    /* Buttons: reduced 30% (70% of previous width/height & font-size) */
+    /* Buttons now size to their text (min-width ensures even longer text fits) */
     #btn-container button {
-      width: 27.44%;         /* 39.2% × 0.7 */
-      height: 55px;          /* 78px × 0.7 ≈ 55px */
-      font-size: 2.912rem;   /* 4.16rem × 0.7 ≈ 2.912rem */
-      margin: 0 auto;        /* center each button horizontally */
-      display: block;        /* ensure margin:auto works */
+      width: auto;                 /* auto width so text never wraps */
+      min-width: 200px;            /* ensure a bit of breathing room */
+      padding: 1rem 2rem;          /* top/bottom 1rem, left/right 2rem */
+      font-size: 2.912rem;         /* same font-size as before */
+      margin: 0.5rem auto;         /* vertical spacing + center horizontally */
+      display: block;              /* so margin: auto centers the button */
     }
 
-    /* Status (top “question” text): was 1.5rem → now 3rem (100% increase) */
+    /* Status (top “question” text): was 3rem → now 6rem (double) */
     #status {
       padding: 1rem;
       text-align: center;
-      font-size: 3rem;
+      font-size: 6rem;
       flex: 0 0 auto;
     }
 
-    /* Transcript (bottom text) remains at 2.4rem unless you want to change it separately */
+    /* Transcript (bottom text) remains unchanged at 2.4rem */
     #transcript {
       padding: 1rem;
       font-size: 2.4rem;
