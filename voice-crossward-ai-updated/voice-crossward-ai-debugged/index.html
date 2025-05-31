@@ -9,17 +9,13 @@
   <style>
     #btn-container button {
       width: auto;
-      min-width: 200px;
-      padding: 1rem 3rem;
       white-space: nowrap;
+      padding: 1rem 3rem;
       font-size: 2.912rem;
       margin: 0.5rem auto;
       display: block;
     }
-    #status {
-      padding: 1rem;
-      text-align: center;
-      font-size: 12rem;
+    #status { padding: 1rem; text-align: center; font-size: 12rem;
       flex: 0 0 auto;
     }
     #transcript {
@@ -181,8 +177,9 @@
       }
     }
     function listGenres() {
-      const prompt = "Available genres are: " + genres.join(", ");
-      speakAsync(prompt);
+      const genreList = genres.join(", ");
+      document.getElementById('status').textContent = "Available genres: " + genreList;
+      speakAsync("Available genres are: " + genreList);
     }
     function listenForGenre() {
       const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
