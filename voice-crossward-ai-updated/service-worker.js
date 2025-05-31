@@ -1,11 +1,16 @@
-const CACHE_NAME = 'v3';
+const CACHE_NAME = 'v4';
 const URLS_TO_CACHE = [
   '/',
   '/index.html',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
-  '/food-questions.json'
+  '/food-questions.json',
+  '/entertainment-questions.json',
+  '/science-questions.json',
+  '/investing-questions.json',
+  '/mystery-questions.json',
+  '/sports-questions.json'
 ];
 
 self.addEventListener('install', event => {

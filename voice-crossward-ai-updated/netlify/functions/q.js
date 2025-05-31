@@ -4,14 +4,7 @@ const OpenAI = require("openai");
 
 exports.handler = async (event) => {
   const genre = event.queryStringParameters && event.queryStringParameters.genre;
-  const validGenres = [
-    "food",
-    "entertainment",
-    "science",
-    "investing",
-    "mystery",
-    "sports"
-  ];
+  const validGenres = ["food","entertainment","science","investing","mystery","sports"];
 
   if (!validGenres.includes(genre)) {
     return { statusCode: 400, body: "Unsupported genre" };
@@ -22,7 +15,6 @@ exports.handler = async (event) => {
   }
 
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
   const systemPrompt = \`
     You are a quiz-master. Provide a JSON array of 20 quiz questions about \${genre}.
     Each element must be an object with exactly these keys: "question", "answer", "difficulty", "hint".
@@ -53,9 +45,7 @@ exports.handler = async (event) => {
     if (!Array.isArray(questions)) {
       throw new Error("Expected an array of questions");
     }
-    questions = questions.filter(
-      (q) => q.question && q.answer && q.hint && q.difficulty
-    );
+    questions = questions.filter(q => q.question && q.answer && q.hint && q.difficulty);
 
     if (questions.length > 20) questions = questions.slice(0, 20);
     if (questions.length < 20) console.warn("Fewer than 20 questions returned");
@@ -67,9 +57,8 @@ exports.handler = async (event) => {
     };
   } catch (openaiError) {
     console.error("OpenAI error:", openaiError);
-
     try {
-      const filePath = path.join(__dirname, "..", "food-questions.json");
+      const filePath = path.join(__dirname, "..", \`\${genre}-questions.json\`);
       const raw = fs.readFileSync(filePath, "utf-8");
       const fallbackQuestions = JSON.parse(raw);
       return {
