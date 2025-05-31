@@ -7,40 +7,30 @@
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#1a202c">
   <style>
-    /* === Consolidated & Adjusted CSS === */
-
-    /* Buttons now size to their text (min-width ensures even longer text fits) */
     #btn-container button {
-      width: auto;                 /* auto width so text never wraps */
-      min-width: 200px;            /* ensure a bit of breathing room */
-      padding: 1rem 2rem;          /* top/bottom 1rem, left/right 2rem */
-      font-size: 2.912rem;         /* same font-size as before */
-      margin: 0.5rem auto;         /* vertical spacing + center horizontally */
-      display: block;              /* so margin: auto centers the button */
+      width: auto;
+      min-width: 200px;
+      padding: 1rem 2rem;
+      font-size: 2.912rem;
+      margin: 0.5rem auto;
+      display: block;
     }
-
-    /* Status (top “question” text): was 3rem → now 6rem (double) */
     #status {
       padding: 1rem;
       text-align: center;
       font-size: 6rem;
       flex: 0 0 auto;
     }
-
-    /* Transcript (bottom text) remains unchanged at 2.4rem */
     #transcript {
       padding: 1rem;
       font-size: 2.4rem;
       text-align: center;
       width: 80%;
     }
-
-    /* The rest of the CSS stays the same */
     #start-btn { background: orange; color: blue; }
     #genre-btn { background: blue; color: orange; }
     #hint-btn  { background: green; color: orange; }
     #stop-btn  { background: red; color: white; }
-
     body {
       margin: 0;
       font-family: sans-serif;
@@ -58,39 +48,11 @@
       align-items: center;
       width: 100%;
     }
-    #mic-meter {
-      width: 80%;
-      height: 32px;
-      background: #eee;
-      margin-top: 1rem;
-    }
-    #mic-fill {
-      height: 100%;
-      background: #4caf50;
-      width: 0%;
-    }
-    #progress-bar {
-      width: 80%;
-      height: 16px;
-      background: #eee;
-      margin: 10px 0;
-      display: none;
-    }
-    #progress-fill {
-      width: 0%;
-      height: 100%;
-      background: #2196f3;
-    }
-    #debug-log {
-      width: 80%;
-      height: 150px;
-      background: #333;
-      color: #fff;
-      font-size: 1rem;
-      overflow: auto;
-      margin-top: 10px;
-      padding: 5px;
-    }
+    #mic-meter { width: 80%; height: 32px; background: #eee; margin-top: 1rem; }
+    #mic-fill { height: 100%; background: #4caf50; width: 0%; }
+    #progress-bar { width: 80%; height: 16px; background: #eee; margin: 10px 0; display: none; }
+    #progress-fill { width: 0%; height: 100%; background: #2196f3; }
+    #debug-log { width: 80%; height: 150px; background: #333; color: #fff; font-size: 1rem; overflow: auto; margin-top: 10px; padding: 5px; }
   </style>
 </head>
 <body>
@@ -109,12 +71,10 @@
   <div id="debug-log"></div>
 
   <script>
-    // Feature detection for voice APIs
     if (!('speechSynthesis' in window) || !( 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
       document.getElementById('status').textContent = "Your browser does not support voice features.";
       console.warn("Browser does not support necessary voice APIs.");
     }
-
     let debugMode = true;
     function debug(msg) {
       if (!debugMode) return;
@@ -123,7 +83,6 @@
       entry.textContent = msg;
       log.appendChild(entry);
     }
-
     function showProgressBar() {
       debug("showProgressBar");
       const bar = document.getElementById('progress-bar');
@@ -135,7 +94,6 @@
         if (w < 80) fill.style.width = (w + 5) + '%';
       }, 200);
     }
-
     function hideProgressBar() {
       debug("hideProgressBar");
       clearInterval(window.progressInterval);
@@ -146,7 +104,6 @@
         fill.style.width = '0%';
       }, 200);
     }
-
     function speakAsync(text) {
       return new Promise(resolve => {
         const msg = new SpeechSynthesisUtterance(text);
@@ -158,7 +115,6 @@
         debug("Speaking: " + text);
       });
     }
-
     let micStream, micAnalyser, micDataArray, micAnimationFrame;
     function startMicMeter() {
       debug("startMicMeter");
@@ -181,7 +137,6 @@
         updateMeter();
       }).catch(err => console.error("Mic error:", err));
     }
-
     function stopMicMeter() {
       debug("stopMicMeter");
       if (micStream) {
@@ -191,10 +146,15 @@
       if (micAnimationFrame) cancelAnimationFrame(micAnimationFrame);
       document.getElementById('mic-fill').style.width = '0%';
     }
-
     let currentGenre = "", questions = [], idx = 0, expectedAnswer = "";
-    const genres = ["food"];
-
+    const genres = [
+      "food",
+      "entertainment",
+      "science",
+      "investing",
+      "mystery",
+      "sports"
+    ];
     async function fetchQuestions(genre) {
       debug("fetchQuestions called for " + genre);
       showProgressBar();
@@ -205,12 +165,12 @@
         questions = await res.json();
         debug("questions loaded from serverless: " + questions.length);
       } catch (e) {
-        debug("Failed to load from server, falling back to local JSON: " + e);
+        debug("Failed to load from server, falling back to local JSON (food only): " + e);
         try {
           const localRes = await fetch('/food-questions.json');
           if (!localRes.ok) throw new Error("Local JSON not found");
           questions = await localRes.json();
-          debug("questions loaded from local JSON: " + questions.length);
+          debug("questions loaded from local JSON (food): " + questions.length);
         } catch (fileErr) {
           debug("Local fallback failed: " + fileErr);
           questions = [];
@@ -219,12 +179,10 @@
         hideProgressBar();
       }
     }
-
     function listGenres() {
       const prompt = "Available genres are: " + genres.join(", ");
       speakAsync(prompt);
     }
-
     function listenForGenre() {
       const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       const rec = new Recognition();
@@ -242,7 +200,7 @@
           await speakAsync("Starting quiz");
           askQuestion();
         } else {
-          await speakAsync("Genre not recognized. Please say food");
+          await speakAsync("Genre not recognized. Please say one of: " + genres.join(", "));
           listenForGenre();
         }
       };
@@ -251,11 +209,9 @@
         listenForGenre();
       };
     }
-
     function normalizeText(s) {
-      return s.replace(/[^\\w\\s]|_/g, "").replace(/\\s+/g, " ").trim().toLowerCase();
+      return s.replace(/[^\w\s]|_/g, "").replace(/\s+/g, " ").trim().toLowerCase();
     }
-
     function askQuestion() {
       if (!questions.length) {
         speakAsync("No questions available.");
@@ -268,7 +224,6 @@
       });
       debug("askQuestion idx=" + idx);
     }
-
     function listenForAnswer() {
       debug("listenForAnswer");
       const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -298,7 +253,6 @@
         listenForAnswer();
       };
     }
-
     document.getElementById('genre-btn').onclick = async () => {
       document.getElementById('genre-btn').disabled = true;
       startMicMeter();
@@ -307,11 +261,9 @@
       listenForGenre();
       document.getElementById('genre-btn').disabled = false;
     };
-
     document.getElementById('hint-btn').onclick = () => {
       speakAsync("Hint: " + (questions[idx]?.hint || ""));
     };
-
     document.getElementById('start-btn').onclick = async () => {
       document.getElementById('start-btn').disabled = true;
       currentGenre = "food";
@@ -324,14 +276,12 @@
       askQuestion();
       document.getElementById('start-btn').disabled = false;
     };
-
     document.getElementById('stop-btn').onclick = () => {
       stopMicMeter();
       speechSynthesis.cancel();
       document.getElementById('status').textContent = "Quiz stopped.";
       debug("Quiz stopped by user.");
     };
-
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/service-worker.js')
